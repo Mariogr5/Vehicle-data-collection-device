@@ -1,4 +1,5 @@
 #include "task.hpp"
+#include "mqtt.hpp"
 
 Elm myELM327 = Elm(1);
 
@@ -34,6 +35,7 @@ static int sm_handler_state_INITIAL(state_machine_t* ev)
 {
     if (button1.pressed) {
       ev->state = RECEIVE_STATE;
+      Serial.println("Clicked");
       return 1;
 	  }
     else
@@ -51,12 +53,13 @@ static int sm_handler_state_RECEIVE_STATE(state_machine_t* ev)
         return 1;
     }
     digitalWrite(32, HIGH);
-    myELM327.set_speed(myELM327.get_speed());
-    myELM327.set_rpm(myELM327.get_rpm());
-    myELM327.set_fuel(myELM327.get_fuel());
-    // myELM327.diagnostic_datas.car_speed = myELM327.get_car_value("speed");
-    // myELM327.diagnostic_datas.car_rpm = myELM327.get_car_value("rpm");
-    // myELM327.diagnostic_datas.fuel_level = myELM327.get_car_value("fuel");
+    // myELM327.set_speed(myELM327.get_speed());
+    // myELM327.set_rpm(myELM327.get_rpm());
+    // myELM327.set_fuel(myELM327.get_fuel());
+    myELM327.set_speed(7);
+    myELM327.set_rpm(12);
+    myELM327.set_fuel(9);
+
     ev->state = SEND_STATE;
     delay(100);
     digitalWrite(32, LOW);
@@ -73,16 +76,21 @@ static int sm_handler_state_SEND_STATE(state_machine_t* ev)
   print("Connect to Network");
   if(connect(1000))
   {
+    if (!connect_MQTT())
+      return 1;
     print("Connection Succesfull!");
-    //mqtt.send(Elm.datas)
-    
-    ev->state = DISPLAY_STATE;
-    return 1;
+    digitalWrite(32, HIGH);
+    if(mqtt_send(myELM327.diagnostic_datas.car_speed, myELM327.diagnostic_datas.car_rpm, myELM327.diagnostic_datas.fuel_level)){
+      delay(100);
+      digitalWrite(32, LOW);
+      ev->state = DISPLAY_STATE;
+      return 1;
+    }
   }
-  else
-    print("Connection Failed!");
-    delay(100);
-    return 1;
+  digitalWrite(32, LOW);
+  print("Connection Failed!");
+  delay(100);
+  return 1;
 }
 static int sm_handler_state_TURN_OFF_STATE(state_machine_t* ev)
 {
@@ -108,6 +116,8 @@ void task_setup(const char* ssid, const char* password)
 	  attachInterrupt(button1.PIN, isr, FALLING);
     setup_display();
     setup_wifi(ssid, password);
+    mqtt_init("192.168.1.146", "", "", "2"); //Zmienione
+    
 }
 
 void task_loop() {
