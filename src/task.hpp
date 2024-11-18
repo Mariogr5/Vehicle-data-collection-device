@@ -8,6 +8,7 @@
 #include "Elm.hpp"
 #include "display.hpp"
 #include "wifi.hpp"
+#include "gps.hpp"
 #include <cstdio>
 
 

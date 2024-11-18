@@ -1,10 +1,12 @@
 #include "mqtt.hpp"
 
 static const char* mqtt_server = "192.168.1.146"; 
-static const char* mqtt_username = "";
-static const char* mqtt_password = "";
+static const char* mqtt_username = "mario";
+static const char* mqtt_password = "Mario123";
 static const char* clientID = "2";
-static const char* topic = "/home/car_dataas";
+static const char* topic = "/home/data_with_localization";
+// static const char* topic = "/home/car_dataas";
+
 
 
 static WiFiClient wifiClient;
@@ -15,11 +17,13 @@ bool connect_MQTT(){
     return client.connect(clientID, mqtt_username, mqtt_password);
 }
 
-bool mqtt_send(float speed, float rpm, float fuel){
+bool mqtt_send(float speed, float rpm, float fuel, double latitude, double longitude){
     StaticJsonDocument<512> doc;
     doc["speed"] = speed;
     doc["fuel"] = fuel;
     doc["rpm"] = rpm;
+    doc["latitude"] = 51.06;  //51.06
+    doc["longitude"] = 17.01; //17.01″
     char jsonBuffer[512];
     serializeJson(doc, jsonBuffer);
 

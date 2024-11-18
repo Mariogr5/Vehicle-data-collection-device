@@ -2,6 +2,7 @@
 #include "mqtt.hpp"
 
 Elm myELM327 = Elm(1);
+localization_coordinates coordinates;
 
 
 typedef struct{
@@ -53,34 +54,47 @@ static int sm_handler_state_RECEIVE_STATE(state_machine_t* ev)
         return 1;
     }
     digitalWrite(32, HIGH);
+    // print("Receiving datas: ");
     // myELM327.set_speed(myELM327.get_speed());
     // myELM327.set_rpm(myELM327.get_rpm());
     // myELM327.set_fuel(myELM327.get_fuel());
+    // print("Localization");
+    track_localization();
+    coordinates.geographic_X = get_latitude();
+    coordinates.geographic_Y = get_longitude();
     myELM327.set_speed(7);
     myELM327.set_rpm(12);
     myELM327.set_fuel(9);
-
     ev->state = SEND_STATE;
     delay(100);
-    digitalWrite(32, LOW);
+    // digitalWrite(32, LOW);
     return 1;
 }
 static int sm_handler_state_DISPLAY_STATE(state_machine_t* ev)
 {
-    show_data(myELM327.diagnostic_datas.car_rpm, myELM327.diagnostic_datas.car_speed, myELM327.diagnostic_datas.fuel_level);
+    show_data(myELM327.diagnostic_datas.car_rpm, myELM327.diagnostic_datas.car_speed, myELM327.diagnostic_datas.fuel_level, coordinates.geographic_X, coordinates.geographic_Y);
+    delay(100);
     ev->state = RECEIVE_STATE;
     return 1;
 }
 static int sm_handler_state_SEND_STATE(state_machine_t* ev)
 {
   print("Connect to Network");
-  if(connect(1000))
+  if(connect(100))
   {
+    // print("Connected");
+    // delay(400);
     if (!connect_MQTT())
+    {
+      // print("Dupa");
       return 1;
-    print("Connection Succesfull!");
+    }
+    // print("Connection Succesfull!");
     digitalWrite(32, HIGH);
-    if(mqtt_send(myELM327.diagnostic_datas.car_speed, myELM327.diagnostic_datas.car_rpm, myELM327.diagnostic_datas.fuel_level)){
+    if(mqtt_send(
+      myELM327.diagnostic_datas.car_speed, myELM327.diagnostic_datas.car_rpm,
+      myELM327.diagnostic_datas.fuel_level, coordinates.geographic_X,
+      coordinates.geographic_Y)){
       delay(100);
       digitalWrite(32, LOW);
       ev->state = DISPLAY_STATE;
@@ -115,8 +129,13 @@ void task_setup(const char* ssid, const char* password)
     pinMode(32, OUTPUT);
 	  attachInterrupt(button1.PIN, isr, FALLING);
     setup_display();
+    setup_gps();  // Nowe
+    // print("Connecting to ELM:");
+    // myELM327.init_elm();
+
+
     setup_wifi(ssid, password);
-    mqtt_init("192.168.1.146", "", "", "2"); //Zmienione
+    mqtt_init("192.168.1.146", "mario", "Mario123", "2"); //Zmienione
     
 }
 
