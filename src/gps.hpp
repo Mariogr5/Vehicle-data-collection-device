@@ -14,6 +14,7 @@ struct localization_coordinates
 };
 
 void setup_gps();
+void gps_deinit();
 double get_latitude();
 double get_longitude();
 void track_localization();

@@ -1,27 +1,35 @@
 #include "bluetooth.hpp"
 
    BluetoothSerial SerialBT;
-    void setup_bluetooth(int id) 
+    void setup_bluetooth() 
     {
-        SerialBT.begin("esp_test" + char(id),true);
+        SerialBT.begin("car_device",true);
         SerialBT.setPin("1234");
-
-        if (!SerialBT.connect("OBDII"))
-        {
-            while(1);
-        }
     }
 
-    void setup_bluetooth_bootloader() 
+    bool bluetooth_connect(uint32_t timeout)
     {
-        SerialBT.begin("car_device_bootload", false);
+        uint32_t time = 0;
+        while(!SerialBT.connect("ELMULATOR"))
+        {
+            time++;
+            if(time >= timeout)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    void setup_bluetooth_initialization() 
+    {
+        SerialBT.begin("car_device_bootload_2", false);
     }
 
     void bluetooth_deinit()
     {
         SerialBT.end();
     }
-
 
     void send_bluetooth_command(String command)
     {
@@ -31,44 +39,6 @@
         SerialBT.write(buf, command.length());
         delay(1);
     }
-
-    // String receive_bluetooth_datas()
-    // {
-    //     String message = "";
-    //     uint16_t i = 0;
-    //     while (SerialBT.available()) {
-    //         String part = SerialBT.readStringUntil('\n');
-    //         if (part != ">")
-    //             message += part;
-    //         i++;                           
-    //         Serial.println(part);
-    //         if (i == 3) {
-    //         Serial.println(message);
-    //         }
-    //     }
-    //     if (message != "")
-    //         return message;
-    //     return "00 00";
-    // }
-    
-
-    // String receive_bluetooth_datas_test()
-    // {
-    //     String message = "";
-    //     uint16_t i = 0;
-    //     while(1)
-    //     {
-    //         if(SerialBT.available()){
-    //         message += SerialBT.readStringUntil('\n');
-    //         Serial.println(message);
-    //         break;
-    //         }
-    //     }
-
-    //     if (message != "")
-    //         return message;
-    //     return "00 00";
-    // }
 
     bool check_connection()
     {
@@ -81,17 +51,9 @@
         while(true)
         {
             if (SerialBT.available()) {
-                incomingMessage = SerialBT.readStringUntil('\n');  // Odczytujemy dane jako string
-                Serial.print("Received message: ");
-                Serial.println(incomingMessage);
+                incomingMessage = SerialBT.readStringUntil('\n');
                 break;
             }
         }
         return incomingMessage;
     }
-    
-    // void setup_bluetooth_test(int id) 
-    // {
-    //     SerialBT.begin("final_test" + char(id));
-    //     SerialBT.setPin("1234");
-    // }

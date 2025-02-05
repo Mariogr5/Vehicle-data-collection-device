@@ -9,10 +9,11 @@
 #include "display.hpp"
 #include "wifi.hpp"
 #include "gps.hpp"
+#include "initialization.hpp"
 #include <cstdio>
 
-
-typedef enum {INITIAL, RECEIVE_STATE, DISPLAY_STATE, SEND_STATE, TURN_OFF_STATE} state_t;
+#define BOOT_BUTTON_PIN 0
+typedef enum {SLEEP_STATE, INITIAL, RECEIVE_STATE, DISPLAY_STATE, SEND_STATE, TURN_OFF_STATE} state_t;
 
 
 void task_setup(const char* ssid, const char* password);
