@@ -6,13 +6,9 @@
 #include <ArduinoJson.h>
 
 bool connect_MQTT();
-bool mqtt_send(float speed, float rpm, float fuel, double latitude, double longitude);
+void disconnect_MQTT();
 
-void set_mqtt_server(const char* server);
-
-void set_topic(const char* new_topic);
-
+bool mqtt_send(String car_id, float speed, uint32_t rpm, float fuel, double latitude, double longitude);
 void mqtt_init(const char* server, const char* username, const char* password, const char* Id);
-
 
 #endif

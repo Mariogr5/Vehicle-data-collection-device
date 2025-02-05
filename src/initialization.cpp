@@ -1,9 +1,9 @@
-#include "bootloader.hpp"
+#include "initialization.hpp"
 static init_data_frame init_data;
 
 void init_bluetooth()
 {
-    setup_bluetooth_bootloader();
+    setup_bluetooth_initialization();
 }
 
 void send_info(String message)
@@ -47,8 +47,7 @@ String get_actual_password()
     return value;
 }
 
-
-void bootloader_perform()
+void initialization_perform()
 {
     init_NVS();
     if (!is_connection_settings_empty())
@@ -57,8 +56,7 @@ void bootloader_perform()
         return;
     }
     init_bluetooth();
-    // print("Enter data via Bluetooth\n");
-    Serial.println("Connect to device via Bluetooth: car_device");
+    print("Enter data via Bluetooth\n");
     while (!check_connection()){}
     send_info("Enter Car Id\n");
     String car_id = get_user_input();
@@ -73,4 +71,5 @@ void bootloader_perform()
     save_password(password);
     bluetooth_deinit();
     close_NVS();
+    print("zROBIONE");
 }

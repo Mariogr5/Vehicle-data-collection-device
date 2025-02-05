@@ -11,8 +11,9 @@
 
 
 void setup_display();
+void display_deinit();
 void clear_display();
 void print(char* message);
-void show_data(uint16_t rpm, uint16_t speed, uint16_t fuel, float latitude, float longitude);
+void show_data(uint32_t rpm, float speed, float fuel, float latitude, float longitude);
 
 #endif

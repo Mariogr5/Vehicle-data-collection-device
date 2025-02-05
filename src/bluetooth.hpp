@@ -6,14 +6,11 @@
 
     extern BluetoothSerial SerialBT;
 
-    void setup_bluetooth(int id);
-    void setup_bluetooth_bootloader();
+    void setup_bluetooth();
+    void setup_bluetooth_initialization();
     void bluetooth_deinit();
-    // void setup_bluetooth_test(int id);
-
-    void send_bluetooth_command(String PID);
-    // String receive_bluetooth_datas();
-    // String receive_bluetooth_datas_test();
+    bool bluetooth_connect(uint32_t timeout);
+    void send_bluetooth_command(String command);
     String get_message();
     bool check_connection();
 

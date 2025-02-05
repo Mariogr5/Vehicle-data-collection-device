@@ -4,7 +4,7 @@ Adafruit_SSD1306 OLED(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
 void setup_display()
 {
-    if(!OLED.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3D for 128x64
+    if(!OLED.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
       Serial.println(F("SSD1306 allocation failed"));
       for(;;);
     }
@@ -23,18 +23,25 @@ void clear_display()
     OLED.display();
 }
 
-void show_data(uint16_t rpm, uint16_t speed, uint16_t fuel, float latitude, float longitude)
+void display_deinit()
 {
-    char speed_buffer[100];
-    char fuel_buffer[100];
-    char rpm_buffer[100];
+    clear_display();
+    Wire.end();
+}
+
+
+void show_data(uint32_t rpm, float speed, float fuel, float latitude, float longitude)
+{
+    char speed_buffer[1000];
+    char fuel_buffer[1000];
+    char rpm_buffer[1000];
     char latitude_buffer[100];
     char longitude_buffer[100];
-    sprintf(speed_buffer, "Speed: %d", speed);
+    sprintf(speed_buffer, "Speed: %.2f", speed);
     sprintf(rpm_buffer, "Rpm: %d", rpm);
-    sprintf(fuel_buffer, "Fuel: %d %", fuel);
-    sprintf(latitude_buffer, "Latitude: %d %", latitude);
-    sprintf(longitude_buffer, "Longitude: %d %", longitude);
+    sprintf(fuel_buffer, "Fuel: %.2f %%", fuel);
+    sprintf(latitude_buffer, "Latitude: %.2f", latitude);
+    sprintf(longitude_buffer, "Longitude: %.2f", longitude);
 
 
     OLED.clearDisplay();

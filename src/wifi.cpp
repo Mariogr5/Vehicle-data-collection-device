@@ -6,6 +6,12 @@ void setup_wifi(const char* ssid, const char* password)
     WiFi.begin(ssid, password);
 }
 
+void wifi_deinit()
+{
+    WiFi.disconnect(true);
+    WiFi.mode(WIFI_OFF);
+}
+
 bool connect(uint32_t timeout)
 {
     uint32_t start_time = millis();
